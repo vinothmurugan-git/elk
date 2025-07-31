@@ -1,55 +1,116 @@
-<h1 id="🔍-elk-stack-on-docker">🔍 ELK Stack on Docker</h1>
-<p>A complete ELK Stack (Elasticsearch, Logstash, Kibana) running on Docker using Docker Compose. Easily deploy a powerful log management and analytics platform with a single command.</p>
-<hr>
-<h2 id="📦-stack-components">📦 Stack Components</h2>
+<h1 id="🚀-elk-stack-on-docker-elasticsearch-logstash-kibana">🚀 ELK Stack on Docker (Elasticsearch, Logstash, Kibana)</h1>
+<p>A ready-to-use <strong>ELK stack</strong> (Elasticsearch, Logstash, Kibana) configured with <strong>Docker Compose</strong>, featuring:</p>
 <ul>
-<li><strong>Elasticsearch</strong> – Stores and indexes log data</li>
-<li><strong>Logstash</strong> – Collects, parses, and transforms logs</li>
-<li><strong>Kibana</strong> – Visualizes data with dashboards and search</li>
-<li><strong>(Optional) Filebeat</strong> – Lightweight log shipper</li>
+<li>Elasticsearch 8.15.1 with security enabled</li>
+<li>Logstash 8.15.1 with monitoring credentials</li>
+<li>Kibana 8.15.1</li>
+<li>Healthchecks and persistent storage</li>
+<li>Custom entrypoint script for Elasticsearch</li>
 </ul>
 <hr>
-<h2 id="🚀-getting-started">🚀 Getting Started</h2>
-<h3 id="prerequisites">Prerequisites</h3>
+<h2 id="📦-services-overview">📦 Services Overview</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Port(s)</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Elasticsearch</td>
+<td><code>9200</code></td>
+<td>REST API for data storage and search</td>
+</tr>
+<tr>
+<td>Logstash</td>
+<td><code>5044</code>, <code>5000</code>, <code>9600</code></td>
+<td>Data ingestion and transformation pipeline</td>
+</tr>
+<tr>
+<td>Kibana</td>
+<td><code>5601</code></td>
+<td>Visualization and dashboard UI</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🧰-prerequisites">🧰 Prerequisites</h2>
 <ul>
 <li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
-<li><a href="https://docs.docker.com/compose/">Docker Compose</a></li>
+<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
 </ul>
-<h3 id="clone-the-repository">Clone the Repository</h3>
+<hr>
+<h2 id="⚙️-setup-instructions">⚙️ Setup Instructions</h2>
+<ol>
+<li><p><strong>Clone this repository:</strong></p>
 <pre><code class="language-bash">git clone https://github.com/your-username/elk-docker.git
 cd elk-docker
 </code></pre>
-<h3 id="start-the-stack">Start the Stack</h3>
-<pre><code class="language-bash">docker-compose up -d
+</li>
+<li><p><strong>Make sure</strong> <code>entrypoint.sh</code>, <code>logstash.conf</code>, <strong>and</strong> <code>kibana.yml</code> are present in the repo root (see structure below).</p>
+</li>
+<li><p><strong>Start the stack:</strong></p>
+<pre><code>docker-compose up
 </code></pre>
-<p>📝 The first build may take a few minutes.</p>
-<p>Once all services are up, access Kibana at: <a href="http://localhost:5601">http://localhost:5601</a></p>
-<h3 id="⚙️-configuration">⚙️ Configuration</h3>
-<p>You can customize:</p>
-<p><strong>Elasticsearch settings</strong> in elasticsearch/config/elasticsearch.yml</p>
-<p><strong>Logstash pipeline</strong> in logstash/pipeline/logstash.conf</p>
-<p><strong>Kibana settings</strong> in kibana/config/kibana.yml</p>
-<h3 id="📁-folder-structure">📁 Folder Structure</h3>
+<p> It may take a minute or two to fully initialize. Elasticsearch must pass its healthcheck before Kibana and Logstash start.</p>
+</li>
+<li><p><strong>Access Kibana:</strong></p>
+<p> <a href="http://localhost:5601">http://localhost:5601</a>
+ Log in using:
+ Username: elastic
+ Password: elasticpasswd</p>
+</li>
+</ol>
+<hr>
+<h2 id="🔐-security">🔐 Security</h2>
+<p>Elasticsearch security is enabled by default.</p>
+<ul>
+<li><p>Built-in user authentication is required (elasticpasswd is set via environment variable).</p>
+</li>
+<li><p>You can update user credentials or set up additional users using the Elasticsearch API.</p>
+</li>
+</ul>
+<hr>
+<h2 id="🧪-healthcheck">🧪 Healthcheck</h2>
+<h2 id="elasticsearch-includes-a-healthcheck-to-ensure-it-is-ready-before-dependent-services-start-it-checks-if-port-9200-is-reachable">Elasticsearch includes a healthcheck to ensure it is ready before dependent services start. It checks if port 9200 is reachable.</h2>
+<h3 id="🗃️-folder-structure">🗃️ Folder Structure</h3>
 <pre><code>elk-docker/
-├── elasticsearch/
-│   └── config/
-│       └── elasticsearch.yml
-├── logstash/
-│   └── pipeline/
-│       └── logstash.conf
-├── kibana/
-│   └── config/
-│       └── kibana.yml
 ├── docker-compose.yml
+├── entrypoint.sh                  # Custom Elasticsearch startup script
+├── kibana.yml                     # Kibana configuration
+├── logstash.conf                  # Logstash pipeline configuration
 └── README.md
 </code></pre>
-<h3 id="🛑-stopping-the-stack">🛑 Stopping the Stack</h3>
-<p>To stop the stack, run:</p>
-<pre><code class="language-bash">docker-compose down 
+<hr>
+<h2 id="📄-configuration-notes">📄 Configuration Notes</h2>
+<p><strong>Elasticsearch</strong></p>
+<ul>
+<li><p>Runs in single-node mode with basic license.</p>
+</li>
+<li><p>Persistent volume es_data stores indexed data.</p>
+</li>
+<li><p>Custom entrypoint script is mounted to ensure controlled startup.</p>
+</li>
+</ul>
+<p><strong>Logstash</strong></p>
+<ul>
+<li><p>Loads pipeline from logstash.conf.</p>
+</li>
+<li><p>Ports 5044, 5000 (TCP/UDP), and 9600 are exposed for Beats, syslog, and monitoring.</p>
+</li>
+</ul>
+<p><strong>Kibana</strong></p>
+<ul>
+<li><p>Uses kibana.yml from your local directory for configuration.</p>
+</li>
+<li><p>Persistent volume kibana_data stores dashboard data.</p>
+</li>
+</ul>
+<hr>
+<h2 id="🛑-stopping-the-stack">🛑 Stopping the Stack</h2>
+<p>To shut down the services:</p>
+<pre><code>docker-compose down
 </code></pre>
-<p>To remove all volumes (warning: this deletes all stored data):</p>
-<pre><code class="language-bash">docker-compose down -v
+<p>To remove all volumes and data:</p>
+<pre><code>docker-compose down -v
 </code></pre>
-<h3 id="🔐-security-optional---but-recommended">🔐 Security (Optional - But Recommended)</h3>
-<p>To enable user authentication, TLS, and other production features, refer to the Elastic Docker documentation and consider using the Elastic Stack Docker images with security enabled.</p>
-
