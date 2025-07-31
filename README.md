@@ -2,7 +2,7 @@
 <p>A ready-to-use <strong>ELK stack</strong> (Elasticsearch, Logstash, Kibana) configured with <strong>Docker Compose</strong>, featuring:</p>
 <ul>
 <li>Elasticsearch 8.15.1 with security enabled</li>
-<li>Logstash 8.15.1 with monitoring credentials</li>
+<li>Logstash 8.15.1 with email alerts</li>
 <li>Kibana 8.15.1</li>
 <li>Healthchecks and persistent storage</li>
 <li>Custom entrypoint script for Elasticsearch</li>
@@ -36,6 +36,7 @@
 <ul>
 <li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
 <li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
+<li>Gmail account or SMTP email service for Logstash alerts</li>
 </ul>
 <h2 id="⚙️-setup-instructions">⚙️ Setup Instructions</h2>
 <ol>
@@ -44,7 +45,38 @@
 cd elk-docker
 </code></pre>
 </li>
-<li><p><strong>Make sure</strong> <code>entrypoint.sh</code>, <code>logstash.conf</code>, <strong>and</strong> <code>kibana.yml</code> are present in the repo root (see structure below).</p>
+<li><p><strong>Required Files Explained</strong></p>
+<p> Make sure the following files are present in your project root:</p>
+<p><code>entrypoint.sh</code> –  <em>Custom Elasticsearch Startup Script</em></p>
+<ul>
+<li>This script starts Elasticsearch, waits until it&#39;s fully running, and then creates a kibana_user account needed for Kibana to connect.</li>
+</ul>
+<p><code>kibana.yml</code> – <em>Kibana Configuration</em></p>
+<ul>
+<li>This config enables encryption, external access, and allows Kibana to securely connect to Elasticsearch using the kibana_user account.</li>
+</ul>
+<p><em>Encryption Key Length Requirements</em></p>
+<ul>
+<li><p>Kibana requires that each of the following encryption keys be at least 32 characters long:</p>
+<p>   <code>xpack.security.encryptionKey</code></p>
+<p>   <code>xpack.encryptedSavedObjects.encryptionKey</code></p>
+<p>   <code>xpack.reporting.encryptionKey</code></p>
+</li>
+<li><p>A minimum of 32 characters ensures proper AES-256 encryption strength.</p>
+</li>
+</ul>
+<p><code>logstash.conf</code> – <em>Logstash Pipeline Configuration</em></p>
+<p>This file defines the full data flow through Logstash: where data comes from, how it’s processed, and where it goes.</p>
+<p><strong>Purpose:</strong></p>
+<p><strong>Input:</strong> Listens for logs (in this case, JSON over TCP port 5000).</p>
+<p><strong>Filter:</strong> Tags log entries containing &quot;error&quot;, &quot;exception&quot;, or &quot;failed&quot; in the message.</p>
+<p><strong>Output:</strong></p>
+<ul>
+<li>Sends logs to Elasticsearch for indexing.</li>
+<li>Outputs logs to console for debugging.</li>
+<li>Sends email alerts for tagged error logs using SMTP.</li>
+</ul>
+<p> 📡 It’s the heart of your log processing pipeline—customizable, extendable, and powerful for real-time log handling.</p>
 </li>
 <li><p><strong>Start the stack:</strong></p>
 <pre><code>docker-compose up
@@ -76,30 +108,6 @@ cd elk-docker
 ├── logstash.conf                  # Logstash pipeline configuration
 └── README.md
 </code></pre>
-<h2 id="📄-configuration-notes">📄 Configuration Notes</h2>
-<p><strong>Elasticsearch</strong></p>
-<ul>
-<li><p>Runs in single-node mode with basic license.</p>
-</li>
-<li><p>Persistent volume es_data stores indexed data.</p>
-</li>
-<li><p>Custom entrypoint script is mounted to ensure controlled startup.</p>
-</li>
-</ul>
-<p><strong>Logstash</strong></p>
-<ul>
-<li><p>Loads pipeline from logstash.conf.</p>
-</li>
-<li><p>Ports 5044, 5000 (TCP/UDP), and 9600 are exposed for Beats, syslog, and monitoring.</p>
-</li>
-</ul>
-<p><strong>Kibana</strong></p>
-<ul>
-<li><p>Uses kibana.yml from your local directory for configuration.</p>
-</li>
-<li><p>Persistent volume kibana_data stores dashboard data.</p>
-</li>
-</ul>
 <h2 id="🛑-stopping-the-stack">🛑 Stopping the Stack</h2>
 <p>To shut down the services:</p>
 <pre><code>docker-compose down
