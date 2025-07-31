@@ -1,0 +1,7 @@
+xpack.security.encryptionKey: "<32-character encrypted key>"
+xpack.encryptedSavedObjects.encryptionKey: "<32-character encrypted key>"
+xpack.reporting.encryptionKey: "<32-character encrypted key>"
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: "kibana_user"
+elasticsearch.password: "kibana_passwd"
