@@ -7,7 +7,6 @@
 <li>Healthchecks and persistent storage</li>
 <li>Custom entrypoint script for Elasticsearch</li>
 </ul>
-<hr>
 <h2 id="📦-services-overview">📦 Services Overview</h2>
 <table>
 <thead>
@@ -33,13 +32,11 @@
 <td>Visualization and dashboard UI</td>
 </tr>
 </tbody></table>
-<hr>
 <h2 id="🧰-prerequisites">🧰 Prerequisites</h2>
 <ul>
 <li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
 <li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
 </ul>
-<hr>
 <h2 id="⚙️-setup-instructions">⚙️ Setup Instructions</h2>
 <ol>
 <li><p><strong>Clone this repository:</strong></p>
@@ -61,7 +58,6 @@ cd elk-docker
  Password: elasticpasswd</p>
 </li>
 </ol>
-<hr>
 <h2 id="🔐-security">🔐 Security</h2>
 <p>Elasticsearch security is enabled by default.</p>
 <ul>
@@ -70,9 +66,8 @@ cd elk-docker
 <li><p>You can update user credentials or set up additional users using the Elasticsearch API.</p>
 </li>
 </ul>
-<hr>
 <h2 id="🧪-healthcheck">🧪 Healthcheck</h2>
-<h2 id="elasticsearch-includes-a-healthcheck-to-ensure-it-is-ready-before-dependent-services-start-it-checks-if-port-9200-is-reachable">Elasticsearch includes a healthcheck to ensure it is ready before dependent services start. It checks if port 9200 is reachable.</h2>
+<p>Elasticsearch includes a healthcheck to ensure it is ready before dependent services start. It checks if port 9200 is reachable.</p>
 <h3 id="🗃️-folder-structure">🗃️ Folder Structure</h3>
 <pre><code>elk-docker/
 ├── docker-compose.yml
@@ -81,7 +76,6 @@ cd elk-docker
 ├── logstash.conf                  # Logstash pipeline configuration
 └── README.md
 </code></pre>
-<hr>
 <h2 id="📄-configuration-notes">📄 Configuration Notes</h2>
 <p><strong>Elasticsearch</strong></p>
 <ul>
@@ -106,7 +100,6 @@ cd elk-docker
 <li><p>Persistent volume kibana_data stores dashboard data.</p>
 </li>
 </ul>
-<hr>
 <h2 id="🛑-stopping-the-stack">🛑 Stopping the Stack</h2>
 <p>To shut down the services:</p>
 <pre><code>docker-compose down
