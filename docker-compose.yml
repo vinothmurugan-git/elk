@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.license.self_generated.type=basic
+      - cluster.name=elk-cluster
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ELASTIC_PASSWORD=elasticpasswd
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+      - ./entrypoint.sh:/usr/local/bin/entrypoint.sh:ro  # Mount the script
+    entrypoint: ["/bin/bash", "/usr/local/bin/entrypoint.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9200 || exit 1"]  # Check if port 9200 is open
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.15.1
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    environment:
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.monitoring.elasticsearch.username=elastic
+      - xpack.monitoring.elasticsearch.password=elasticpasswd
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.1
+    container_name: kibana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+
+volumes:
+  es_data:
+    driver: local
+  kibana_data:
+    driver: local
